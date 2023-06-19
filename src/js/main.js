@@ -2,8 +2,40 @@ const clientId = '535006dca0a6470886de000ba3080671';
 const redirectUri = 'https://mbellifa.github.io/spotify/';
 
 
-const { createApp, ref } = Vue
+const { createApp, ref } = Vue;
 
+async function getProfile(accessToken) {
+
+    const response = await fetch('https://api.spotify.com/v1/me', {
+        headers: {
+            Authorization: 'Bearer ' + accessToken
+        }
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+async function getTopTracks(accessToken) {
+
+    const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
+        headers: {
+            Authorization: 'Bearer ' + accessToken
+        }
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+function accessTokenReady() {
+    let accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+        getProfile(accessToken).then(data => console.log(data));
+        getTopTracks(accessToken).then(data => console.log(data));
+    }
+
+}
 createApp({
     setup() {
         const message = ref('Hello vue!');
@@ -11,7 +43,7 @@ createApp({
         function authorizeApp() {
             generateCodeChallenge(codeVerifier).then(codeChallenge => {
                 let state = generateRandomString(16);
-                let scope = 'user-read-private user-read-email';
+                let scope = 'user-read-private user-read-email user-top-read';
 
                 localStorage.setItem('code_verifier', codeVerifier);
 
@@ -63,26 +95,13 @@ createApp({
                 })
                 .then(data => {
                     localStorage.setItem('access_token', data.access_token);
+                    accessTokenReady();
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         }
-        let accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-            async function getProfile(accessToken) {
-
-                const response = await fetch('https://api.spotify.com/v1/me', {
-                    headers: {
-                        Authorization: 'Bearer ' + accessToken
-                    }
-                });
-
-                const data = await response.json();
-                return data;
-            }
-            getProfile(accessToken).then(data => console.log(data));
-        }
+        accessTokenReady();
         console.log("mounted!");
     }
 }).mount('#app')
