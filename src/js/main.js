@@ -32,7 +32,7 @@ function accessTokenReady(instance) {
     let accessToken = localStorage.getItem('access_token');
     if (accessToken) {
         getProfile(accessToken).then(data => console.log(data));
-        getTopTracks(accessToken).then(data => instance.topTracks = data);
+        getTopTracks(accessToken).then(data => instance.topTracks = data.items);
     }
 
 }
