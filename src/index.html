@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Test</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
-Test
+<div id="app">
+    {{ message }}
+
+<a v-if="!authorized" href="#authorize" @click="authorizeApp">Authorize</a>
+</div>
+<script src="js/main.js"></script>
 </body>
 </html>
