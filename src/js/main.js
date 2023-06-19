@@ -28,10 +28,9 @@ async function getTopTracks(accessToken) {
     return data;
 }
 
-function accessTokenReady() {
+function accessTokenReady(instance) {
     let accessToken = localStorage.getItem('access_token');
     if (accessToken) {
-        let instance = getCurrentInstance();
         getProfile(accessToken).then(data => console.log(data));
         getTopTracks(accessToken).then(data => instance.topTracks = data);
     }
@@ -96,13 +95,13 @@ createApp({
                 })
                 .then(data => {
                     localStorage.setItem('access_token', data.access_token);
-                    accessTokenReady();
+                    accessTokenReady(this);
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         }
-        accessTokenReady();
+        accessTokenReady(this);
         console.log("mounted!");
     }
 }).mount('#app')
