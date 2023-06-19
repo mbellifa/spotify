@@ -27,12 +27,39 @@ async function getTopTracks(accessToken) {
     const data = await response.json();
     return data;
 }
+async function getRecommendedTracks(accessToken, trackId) {
+    const response = await fetch('https://api.spotify.com/v1/recommendations?' + new URLSearchParams({'seed_tracks':trackId}), {
+        headers: {
+            Authorization: 'Bearer ' + accessToken
+        }
+    });
+
+    const data = await response.json();
+    return data;
+}
+function trackObjToName(trackObj) {
+    return trackObj.artists.map(artist => artist.name).join(', ') + ' - ' + trackObj.name;
+
+}
 
 function accessTokenReady(instance) {
     let accessToken = localStorage.getItem('access_token');
     if (accessToken) {
         getProfile(accessToken).then(data => console.log(data));
-        getTopTracks(accessToken).then(data => instance.topTracks = data.items);
+        getTopTracks(accessToken).then(data => {
+            instance.topTracks = data.items;
+            for (let i=0;i < instance.topTracks.length; i++) {
+                setTimeout(() => {
+                    getRecommendedTracks(accessToken, instance.topTracks[i].id).then(data => {
+                        data.tracks.forEach(track => {
+                            instance.recommendedTracks[track.id] = (instance.recommendedTracks[track.id] || 0) + 1;
+                            instance.trackIdLookup[track.id] = trackObjToName(track);
+                        })
+                    });
+                }, i * 1000);
+            }
+        });
+
     }
 
 }
@@ -40,6 +67,8 @@ createApp({
     setup() {
         const topTracks = ref([]);
         const authorized = ref(false);
+        const recommendedTracks = ref({});
+        const trackIdLookup = ref({});
         function authorizeApp() {
             generateCodeChallenge(codeVerifier).then(codeChallenge => {
                 let state = generateRandomString(16);
@@ -63,7 +92,9 @@ createApp({
         return {
             authorized,
             topTracks,
-            authorizeApp
+            authorizeApp,
+            recommendedTracks,
+            trackIdLookup
         }
     },
     mounted() {

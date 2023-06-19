@@ -19,6 +19,10 @@
             </li>
         </ol>
 
+        Recommended Tracks:
+        <ul>
+            <li v-for="(value, key) in recommendedTracks"> {{trackIdLookup[key]}}: {{value}}</li>
+        </ul>
     </div>
 <a v-if="!authorized" href="#authorize" @click="authorizeApp">Authorize</a>
 </div>
