@@ -1,5 +1,5 @@
 const clientId = '535006dca0a6470886de000ba3080671';
-const redirectUri = 'https://github.com/mbellifa/spotify/';
+const redirectUri = 'https://mbellifa.github.io/spotify/';
 
 
 const { createApp, ref } = Vue
