@@ -2,7 +2,7 @@ const clientId = '535006dca0a6470886de000ba3080671';
 const redirectUri = 'https://mbellifa.github.io/spotify/';
 
 
-const { createApp, ref } = Vue;
+const { createApp, ref, getCurrentInstance } = Vue;
 
 async function getProfile(accessToken) {
 
@@ -31,14 +31,15 @@ async function getTopTracks(accessToken) {
 function accessTokenReady() {
     let accessToken = localStorage.getItem('access_token');
     if (accessToken) {
+        let instance = getCurrentInstance();
         getProfile(accessToken).then(data => console.log(data));
-        getTopTracks(accessToken).then(data => console.log(data));
+        getTopTracks(accessToken).then(data => instance.topTracks = data);
     }
 
 }
 createApp({
     setup() {
-        const message = ref('Hello vue!');
+        const topTracks = ref([]);
         const authorized = ref(false);
         function authorizeApp() {
             generateCodeChallenge(codeVerifier).then(codeChallenge => {
@@ -61,8 +62,8 @@ createApp({
             });
         }
         return {
-            message,
             authorized,
+            topTracks,
             authorizeApp
         }
     },

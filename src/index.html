@@ -7,8 +7,19 @@
 </head>
 <body>
 <div id="app">
-    {{ message }}
+    <div v-if="authorized">
+        Top tracks:
+        <ol>
+            <li v-for="topTrack in topTracks">
+            <span v-for="artist in topTrack.artists">
+                {{artist.name}}
+            </span>
+                -
+                {{topTrack.name}}
+            </li>
+        </ol>
 
+    </div>
 <a v-if="!authorized" href="#authorize" @click="authorizeApp">Authorize</a>
 </div>
 <script src="js/main.js"></script>
